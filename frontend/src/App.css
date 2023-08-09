@@ -87,3 +87,12 @@ h3 {
     padding: 10px;
   }
 }
+
+.list-component-parent-container {
+  display: flex;
+  overflow-x: scroll;
+}
+
+.list-component-parent-item {
+  margin: 25px 25px;
+}

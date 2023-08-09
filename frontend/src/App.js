@@ -2,12 +2,48 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 import Navbar from './Navbar';
+import ListComponent from "./components/ListComponent";
+import { TaskStatus } from './constants/constants';
 
 function App() {
   const [lists, setLists] = useState([]);
   const [newListTitle, setNewListTitle] = useState('');
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [selectedList, setSelectedList] = useState(null);
+
+  const task1 = {
+    name: "Task 1",
+    status: TaskStatus.In_Progress
+  };
+  const task2 = {
+    name: "Task 2",
+    status: TaskStatus.Completed
+  };
+
+  const onTaskStatusChange = (listIndex) => (taskIndex) => {
+    const newListDefinitionArray = [...listDefinitionArray]
+    const currentListDefinition = newListDefinitionArray[listIndex];
+    const currentTask = currentListDefinition.tasks[taskIndex];
+    currentTask.status = currentTask.status === TaskStatus.Completed ? TaskStatus.In_Progress : TaskStatus.Completed;
+    currentListDefinition.tasks[taskIndex] = currentTask;
+    newListDefinitionArray[listIndex] = currentListDefinition;
+    setListDefinitionArray(newListDefinitionArray);
+    //TODO: Add callback to update list
+  }
+
+  const defaultListArray = [{
+    title: "List 1",
+    tasks: [{...task1}, {...task2}]
+  }, {
+    title: "List 2",
+    tasks: [{...task1}]
+  }, {
+    title: "List 3",
+    tasks: [{...task2}]
+  }];
+
+  const [listDefinitionArray, setListDefinitionArray] = useState(defaultListArray);
+
 
   useEffect(() => {
     fetchLists();
@@ -67,7 +103,7 @@ function App() {
       margin: "-15px auto"
     }
   }
-  
+
 
   return (
     <>
@@ -104,15 +140,22 @@ function App() {
         </div>
         <div>
           <h2>Lists</h2>
+          <div class="list-component-parent-container">
+            {listDefinitionArray.map((listDefinition, listIndex) => (
+              <div class="list-component-parent-item">
+                <ListComponent listDefinition={listDefinition} onTaskStatusChange={onTaskStatusChange(listIndex)} />
+              </div>
+            ))}
+          </div>
           <div style={styles.li}>
-          {lists.map((list) => (
-            <div key={list.id} className="list" onClick={() => handleListClick(list.id)}>
-              <h3>{list.title}</h3>
-              {list.Tasks.map((task) => (
-                <p key={task.id} className="task">{task.title}</p>
-              ))}
-            </div>
-          ))}
+            {lists.map((list) => (
+              <div key={list.id} className="list" onClick={() => handleListClick(list.id)}>
+                <h3>{list.title}</h3>
+                {list.Tasks.map((task) => (
+                  <p key={task.id} className="task">{task.title}</p>
+                ))}
+              </div>
+            ))}
           </div>
         </div>
       </div>

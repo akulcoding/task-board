@@ -1,0 +1,32 @@
+.list-component-container {
+    display: flex;
+    flex-direction: column;
+    background-color: rgb(228, 228, 228);
+    width: 300px;
+    height: 500px;
+}
+
+.list-component-title {
+    background-color: rgb(180, 180, 180);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.list-component-item {
+    display: flex;
+    padding-left: 10px;
+    margin: 10px 10px;
+    flex-direction: row;
+    align-items: center;
+    background-color: white;
+}
+
+.task-status-box {
+    width: 30px;
+    height: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgb(250, 213, 217);
+}
