@@ -4,6 +4,8 @@ import axios from 'axios';
 import Navbar from './Navbar';
 import ListComponent from "./components/ListComponent";
 import { TaskStatus } from './constants/constants';
+import { DragDropContext } from "react-beautiful-dnd";
+import { onDragEnd } from "./utils/dndUtils";
 
 function App() {
   const [lists, setLists] = useState([]);
@@ -32,14 +34,17 @@ function App() {
   }
 
   const defaultListArray = [{
+    index: 1,
     title: "List 1",
-    tasks: [{...task1}, {...task2}]
+    tasks: [{ ...task1 }, { ...task2 }]
   }, {
+    index: 2,
     title: "List 2",
-    tasks: [{...task1}]
+    tasks: [{ ...task1 }]
   }, {
+    index: 3,
     title: "List 3",
-    tasks: [{...task2}]
+    tasks: [{ ...task2 }]
   }];
 
   const [listDefinitionArray, setListDefinitionArray] = useState(defaultListArray);
@@ -141,11 +146,13 @@ function App() {
         <div>
           <h2>Lists</h2>
           <div class="list-component-parent-container">
-            {listDefinitionArray.map((listDefinition, listIndex) => (
-              <div class="list-component-parent-item">
-                <ListComponent listDefinition={listDefinition} onTaskStatusChange={onTaskStatusChange(listIndex)} />
-              </div>
-            ))}
+            <DragDropContext onDragEnd={(result) => onDragEnd(result, listDefinitionArray, setListDefinitionArray)}>
+              {listDefinitionArray.map((listDefinition, listIndex) => (
+                <div class="list-component-parent-item">
+                  <ListComponent listDefinition={listDefinition} onTaskStatusChange={onTaskStatusChange(listIndex)} listIndex={listIndex} />
+                </div>
+              ))}
+            </DragDropContext>
           </div>
           <div style={styles.li}>
             {lists.map((list) => (
