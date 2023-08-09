@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './App.css';
 import axios from 'axios';
 import Navbar from './Navbar';
-import ListComponent from "./components/ListComponent";
+import ListComponent from "./components/ListComponent/ListComponent";
 import { TaskStatus } from './constants/constants';
 import { DragDropContext } from "react-beautiful-dnd";
 import { onDragEnd } from "./utils/dndUtils";

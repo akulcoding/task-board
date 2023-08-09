@@ -1,6 +1,13 @@
 import React from 'react';
+import  { useNavigate } from 'react-router-dom';
 
-const Navbar = ({ username, onLogout }) => {
+const Navbar = ({ username }) => {
+  const navigate = useNavigate();
+
+  const onLogout = () => {
+    navigate("/");
+  }
+
   return (
     <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 20px', backgroundColor: '#333', color: '#fff' }}>
       <div>

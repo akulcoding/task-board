@@ -1,9 +1,9 @@
 import React from 'react';
-import { TaskStatus } from '../constants/constants';
+import { TaskStatus } from '../../constants/constants';
 import { TiTick } from 'react-icons/ti';
 import "./ListComponent.css";
 import { Droppable, Draggable } from "react-beautiful-dnd";
-import { getListStyle, getItemStyle } from "../utils/dndUtils"; 
+import { getListStyle, getItemStyle } from "../../utils/dndUtils"; 
 
 const ListComponent = ({ listDefinition, onTaskStatusChange, listIndex }) => (
   <div class="list-component-container">
