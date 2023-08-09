@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const sequelize = new Sequelize('todo_test', 'postgres', 'Akul', {
+const sequelize = new Sequelize('aayushh', 'postgres', 'Akul', {
   host: 'localhost',
   dialect: 'postgres'
 });
@@ -33,7 +33,29 @@ const Task = sequelize.define('Task', {
 List.hasMany(Task);
 Task.belongsTo(List);
 
-sequelize.sync();
+
+// Define User model
+const User = sequelize.define('User', {
+  username: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    unique: true
+  },
+  password: {
+    type: DataTypes.STRING,
+    allowNull: false
+  }
+});
+
+// Sync models with the database
+sequelize.sync()
+  .then(() => {
+    console.log('Database synced');
+  })
+  .catch(err => {
+    console.error('Error syncing database:', err);
+  });
+
 
 app.get('/lists', async (req, res) => {
   const lists = await List.findAll({ include: Task });
@@ -77,6 +99,37 @@ app.post('/update/task/listId', async (req, res) => {
     console.log("LOG ERROR: err", err);
   }
 });
+
+
+// Routes for registering and logging in users
+app.post('/register', async (req, res) => {
+  console.log("LOG INFO: req", req.body);
+  const { rusername, rpassword } = req.body;
+  try {
+    const user = await User.create({ username: rusername, password: rpassword });
+    res.json(user);
+  } catch (error) {
+    console.log("LOG ERROR: error", error);
+    res.status(500).json({ error: 'An error occurred while registering.', message: error });
+  }
+});
+
+app.post('/login', async (req, res) => {
+  console.log("LOG INFO: req", req.body);
+
+  const { lusername: username, lpassword: password } = req.body;
+  try {
+    const user = await User.findOne({ where: { username, password } });
+    if (user) {
+      res.json({ message: 'Login successful.' });
+    } else {
+      res.status(401).json({ error: 'Invalid credentials.' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: 'An error occurred while logging in.' });
+  }
+});
+
 
 app.listen(5001, () => {
   console.log('Server is running on port 5001');
