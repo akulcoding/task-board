@@ -1,4 +1,3 @@
-
 /**
  * Moves an item from one list to another list.
  */
@@ -24,8 +23,9 @@ export const reorder = (list, startIndex, endIndex) => {
     return result;
 };
 
-export const onDragEnd = (result, state, setState) => {
+export const onDragEnd = (result, state, setState, updateTaskParentList) => {
     const { source, destination } = result;
+    console.log("LOG INFO: onDragEnd result", result, state);
 
     // // dropped outside the list
     if (!destination) {
@@ -33,17 +33,20 @@ export const onDragEnd = (result, state, setState) => {
     }
     const sInd = +source.droppableId;
     const dInd = +destination.droppableId;
+    const sourceTaskId = state[sInd].Tasks[source.index].id;
+    const destinationListId = state[dInd].id;
     if (sInd === dInd) {
-        const items = reorder(state[sInd].tasks, source.index, destination.index);
+        const items = reorder(state[sInd].Tasks, source.index, destination.index);
         const newState = [...state];
-        newState[sInd].tasks = items;
+        newState[sInd].Tasks = items;
         setState(newState);
     } else {
-        const result = move(state[sInd].tasks, state[dInd].tasks, source, destination);
+        const result = move(state[sInd].Tasks, state[dInd].Tasks, source, destination);
         const newState = [...state];
-        newState[sInd].tasks = result[sInd];
-        newState[dInd].tasks = result[dInd];
-        setState(newState.filter(state => state.tasks.length));
+        newState[sInd].Tasks = result[sInd];
+        newState[dInd].Tasks = result[dInd];
+        setState(newState.filter(state => state.Tasks.length));
+        updateTaskParentList(sourceTaskId, destinationListId);
     }
     //TODO: API call to update state in backend
 }

@@ -11,44 +11,21 @@ function App() {
   const [lists, setLists] = useState([]);
   const [newListTitle, setNewListTitle] = useState('');
   const [newTaskTitle, setNewTaskTitle] = useState('');
-  const [selectedList, setSelectedList] = useState(null);
-
-  const task1 = {
-    name: "Task 1",
-    status: TaskStatus.In_Progress
-  };
-  const task2 = {
-    name: "Task 2",
-    status: TaskStatus.Completed
-  };
+  const [selectedList, setSelectedList] = useState(lists?.length > 0 ? lists[0].id : null);
 
   const onTaskStatusChange = (listIndex) => (taskIndex) => {
-    const newListDefinitionArray = [...listDefinitionArray]
+    const newListDefinitionArray = [...lists];
     const currentListDefinition = newListDefinitionArray[listIndex];
-    const currentTask = currentListDefinition.tasks[taskIndex];
-    currentTask.status = currentTask.status === TaskStatus.Completed ? TaskStatus.In_Progress : TaskStatus.Completed;
-    currentListDefinition.tasks[taskIndex] = currentTask;
+    const currentTask = currentListDefinition.Tasks[taskIndex];
+
+    currentTask.taskStatus = currentTask.taskStatus === TaskStatus.Completed ? TaskStatus.In_Progress : TaskStatus.Completed;
+    currentListDefinition.Tasks[taskIndex] = currentTask;
     newListDefinitionArray[listIndex] = currentListDefinition;
-    setListDefinitionArray(newListDefinitionArray);
-    //TODO: Add callback to update list
+    setLists(newListDefinitionArray);
+
+    // TODO: Add callback to update list
+    updateTaskStatus(lists[listIndex]?.Tasks[taskIndex]?.id, currentTask.taskStatus);
   }
-
-  const defaultListArray = [{
-    index: 1,
-    title: "List 1",
-    tasks: [{ ...task1 }, { ...task2 }]
-  }, {
-    index: 2,
-    title: "List 2",
-    tasks: [{ ...task1 }]
-  }, {
-    index: 3,
-    title: "List 3",
-    tasks: [{ ...task2 }]
-  }];
-
-  const [listDefinitionArray, setListDefinitionArray] = useState(defaultListArray);
-
 
   useEffect(() => {
     fetchLists();
@@ -56,7 +33,7 @@ function App() {
 
   const fetchLists = async () => {
     try {
-      const response = await axios.get('http://localhost:5000/lists');
+      const response = await axios.get('http://localhost:5001/lists');
       setLists(response.data);
     } catch (error) {
       console.error('Error fetching lists:', error);
@@ -66,7 +43,7 @@ function App() {
   const createList = async () => {
     if (newListTitle) {
       try {
-        const response = await axios.post('http://localhost:5000/lists', { title: newListTitle });
+        const response = await axios.post('http://localhost:5001/lists', { title: newListTitle });
         setLists([...lists, response.data]);
         setNewListTitle('');
       } catch (error) {
@@ -78,7 +55,7 @@ function App() {
   const createTask = async () => {
     if (newTaskTitle && selectedList) {
       try {
-        await axios.post('http://localhost:5000/tasks', { title: newTaskTitle, listId: selectedList });
+        await axios.post('http://localhost:5001/create/task', { title: newTaskTitle, listId: selectedList, taskStatus: TaskStatus.In_Progress });
         fetchLists();
         setNewTaskTitle('');
       } catch (error) {
@@ -87,9 +64,26 @@ function App() {
     }
   };
 
-  const handleListClick = (listId) => {
-    setSelectedList(listId);
-  };
+  const updateTaskStatus = async (taskId, newStatus) => {
+    try {
+      await axios.post('http://localhost:5001/update/task/taskStatus', { id: taskId, taskStatus: newStatus });
+      fetchLists();
+      setNewTaskTitle('');
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
+  }
+
+  const updateTaskParentList = async (taskId, newParentListId) => {
+    try {
+      console.log("LOG INFO: updateTaskParentList", taskId, newParentListId);
+      await axios.post('http://localhost:5001/update/task/listId', { id: taskId, listId: newParentListId });
+      fetchLists();
+      setNewTaskTitle('');
+    } catch (error) {
+      console.error('Error creating task:', error);
+    }
+  }
 
   const styles = {
     li: {
@@ -109,11 +103,12 @@ function App() {
     }
   }
 
+  console.log("LOG INFO: lists", lists);
 
   return (
     <>
       <Navbar username="Akul" /*onLogout={handleLogout}*/ />
-      <div className="container">
+      <div class="container">
         <h1 style={styles.hd}>Task Board</h1>
         <div>
           <h2>Create a List</h2>
@@ -135,7 +130,7 @@ function App() {
             onChange={(e) => setNewTaskTitle(e.target.value)}
             style={styles.hd}
           />
-          <select onChange={(e) => setSelectedList(e.target.value)}>
+          <select value={selectedList} onChange={(e) => setSelectedList(e.target.value)}>
             <option value="" disabled>Select a list</option>
             {lists.map((list) => (
               <option key={list.id} value={list.id}>{list.title}</option>
@@ -146,23 +141,13 @@ function App() {
         <div>
           <h2>Lists</h2>
           <div class="list-component-parent-container">
-            <DragDropContext onDragEnd={(result) => onDragEnd(result, listDefinitionArray, setListDefinitionArray)}>
-              {listDefinitionArray.map((listDefinition, listIndex) => (
+            <DragDropContext onDragEnd={(result) => onDragEnd(result, lists, setLists, updateTaskParentList)}>
+              {lists?.map((listDefinition, listIndex) => (
                 <div class="list-component-parent-item">
                   <ListComponent listDefinition={listDefinition} onTaskStatusChange={onTaskStatusChange(listIndex)} listIndex={listIndex} />
                 </div>
               ))}
             </DragDropContext>
-          </div>
-          <div style={styles.li}>
-            {lists.map((list) => (
-              <div key={list.id} className="list" onClick={() => handleListClick(list.id)}>
-                <h3>{list.title}</h3>
-                {list.Tasks.map((task) => (
-                  <p key={task.id} className="task">{task.title}</p>
-                ))}
-              </div>
-            ))}
           </div>
         </div>
       </div>

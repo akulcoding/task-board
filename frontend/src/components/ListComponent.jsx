@@ -17,10 +17,10 @@ const ListComponent = ({ listDefinition, onTaskStatusChange, listIndex }) => (
           <div class="list-component-title">
             <p><strong>{listDefinition.title}</strong></p>
           </div>
-          {listDefinition.tasks.map((task, taskIndex) => (
+          {listDefinition.Tasks?.map((task, taskIndex) => (
             <Draggable
-              key={`${listDefinition.index}-${taskIndex}`}
-              draggableId={`${listDefinition.index}-${taskIndex}`}
+              key={`${listIndex}-${taskIndex}`}
+              draggableId={`${listIndex}-${taskIndex}`}
               index={taskIndex}
             >
               {(provided, snapshot) => (
@@ -34,8 +34,8 @@ const ListComponent = ({ listDefinition, onTaskStatusChange, listIndex }) => (
                   )}
                 >
                   <div class="list-component-item">
-                    <TaskStatusBox status={task.status} onTaskStatusChange={() => onTaskStatusChange(taskIndex)} />
-                    <p style={{ paddingLeft: "5px" }}>{task.name}</p>
+                    <TaskStatusBox status={task.taskStatus} onTaskStatusChange={() => onTaskStatusChange(taskIndex)} />
+                    <p style={{ paddingLeft: "5px" }}>{task.title}</p>
                   </div>
                 </div>
               )}
@@ -47,12 +47,16 @@ const ListComponent = ({ listDefinition, onTaskStatusChange, listIndex }) => (
   </div>
 );
 
-const TaskStatusBox = ({ status, onTaskStatusChange }) => (
-  <div class={'task-status-box'} onClick={onTaskStatusChange}>
-    {status === TaskStatus.Completed ?
-      <TiTick /> : <></>
-    }
-  </div>
-)
+const TaskStatusBox = ({ status, onTaskStatusChange }) => {
+  console.log("LOG INFO: TaskStatusBox", status);
+return (<div class={'task-status-box'} onClick={onTaskStatusChange}>
+{status === TaskStatus.Completed ?
+  <TiTick /> : <></>
+}
+</div>)
+  
+}
+  
+
 
 export default ListComponent;
