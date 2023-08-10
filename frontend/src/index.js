@@ -7,11 +7,16 @@ import {
 import './index.css';
 import AuthComponent from './components/AuthComponent/AuthComponent';
 import App from './App';
+import RegisterPage from './components/AuthComponent/Register';
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <AuthComponent/>,
+    },
+    {
+        path: "/register",
+        element: <RegisterPage />
     },
     {
         path: "/lists",

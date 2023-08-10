@@ -7,7 +7,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const sequelize = new Sequelize('aayushh', 'postgres', 'Akul', {
+const sequelize = new Sequelize('task', 'postgres', 'Akul', {
   host: 'localhost',
   dialect: 'postgres'
 });
